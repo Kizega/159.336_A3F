@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/backButtonAddMeal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_back"
+            android:onClick="goBackToMain"/>
+
+        <!-- Meal Name EditText -->
+        <EditText
+            android:id="@+id/mealName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_meal_name"
+            android:inputType="text"
+            android:importantForAccessibility="yes"
+            android:padding="16dp"
+            android:autofillHints="username" /> <!-- Autofill hints for better user experience -->
+
+        <!-- Ingredient Container -->
+        <LinearLayout
+            android:id="@+id/ingredientContainer"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Add Ingredient Button -->
+        <Button
+            android:id="@+id/addIngredientButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_add_ingredient"
+            android:onClick="addIngredient"
+            android:minHeight="48dp"
+        android:minWidth="64dp" />
+
+        <!-- Spinner for Meal Type -->
+        <Spinner
+            android:id="@+id/mealTypeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+        android:padding="16dp" />
+
+        <!-- Date Picker -->
+        <DatePicker
+            android:id="@+id/datePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Add Meal Button -->
+        <Button
+            android:id="@+id/btnAddMeal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_add_meal"
+            android:onClick="saveMeal"
+            android:minHeight="48dp"
+        android:padding="16dp"
+        android:importantForAccessibility="yes"/>
+    </LinearLayout>
+</ScrollView>

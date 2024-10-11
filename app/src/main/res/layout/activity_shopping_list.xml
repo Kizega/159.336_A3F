@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+
+    <!-- Top container for back button and title -->
+    <LinearLayout
+        android:id="@+id/top_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="40dp"
+        android:paddingBottom="24dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <!-- Back Button (aligned to the left) -->
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/rounded_button"
+            android:src="@drawable/ic_back"
+            android:contentDescription="@string/back"
+            android:padding="8dp"
+            android:backgroundTint="@color/cookie_beige"
+            app:tint="@color/chocolate_brown" />
+
+        <!-- Title for Shopping List -->
+        <TextView
+            android:id="@+id/shopping_list_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/shopping_list"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/chocolate_brown"
+            android:gravity="center"
+            android:layout_marginStart="16dp" />
+    </LinearLayout>
+
+    <!-- Container for dynamically adding shopping list items -->
+    <LinearLayout
+        android:id="@+id/shoppingListContainer"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp" />
+
+</LinearLayout>

@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Meal Planner</string>
+    <string-array name="meal_type_array">
+        <item>Breakfast</item>
+        <item>Lunch</item>
+        <item>Dinner</item>
+    </string-array>
+    <string name="btn_add_ingredient">Add Ingredient</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_add_meal">Add Meal</string>
+    <string name="hint_meal_name">Meal Name</string>
+    <string name="date_prefix">Date: </string>
+    <string name="no_meals">No meals for the next 7 days.</string>
+    <string name="ingredient_hint">Ingredient</string>
+    <string name="quantity_hint">Quantity</string>
+    <string name="label_today">Today</string>
+    <string name="label_week">Week</string>
+    <string name="label_shopping_list">Shopping List</string>
+    <string name="label_add_meal">Add Meal</string>
+    <string name="delishimo_logo_description">Delishimo Logo</string>
+    <string name="weeks_meal_plan">Week\'s Meal Plan</string>
+    <string name="shopping_list">Shopping List</string>
+    <string name="back">Back</string>
+    <string-array name="category_array">
+        <item>Vegetables</item>
+        <item>Meat</item>
+        <item>Other</item>
+    </string-array>
+</resources>
