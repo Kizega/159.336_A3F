@@ -21,6 +21,8 @@
     <string name="weeks_meal_plan">Week\'s Meal Plan</string>
     <string name="shopping_list">Shopping List</string>
     <string name="back">Back</string>
+    <string name="meal_icon_description">Meal icon</string>
+    <string name="no_meals_message">No meals for the next 7 days.</string>
     <string-array name="category_array">
         <item>Vegetables</item>
         <item>Meat</item>

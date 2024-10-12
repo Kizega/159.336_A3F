@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,23 +84,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Query to get ingredients grouped by name and category, summing quantities
         String query = "SELECT name, category, SUM(CAST(quantity AS INTEGER)) as totalQuantity FROM ingredients GROUP BY name, category";
         Cursor cursor = db.rawQuery(query, null);
-        String[] columnNames = cursor.getColumnNames();
-        for (String columnName : columnNames) {
-            Log.d("DatabaseHelper", "Column: " + columnName);
-        }
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             do {
-                String ingredientName = cursor.getString(cursor.getColumnIndex("name"));
-                String category = cursor.getString(cursor.getColumnIndex("category"));
-                int totalQuantity = cursor.getInt(cursor.getColumnIndex("totalQuantity"));
+                int nameColumnIndex = cursor.getColumnIndex("name");
+                int categoryColumnIndex = cursor.getColumnIndex("category");
+                int totalQuantityColumnIndex = cursor.getColumnIndex("totalQuantity");
 
-                String displayText = ingredientName + " Qty: " + totalQuantity;
-                shoppingList.get(category).add(displayText);
+                if (nameColumnIndex != -1 && categoryColumnIndex != -1 && totalQuantityColumnIndex != -1) {
+                    String ingredientName = cursor.getString(nameColumnIndex);
+                    String category = cursor.getString(categoryColumnIndex);
+                    int totalQuantity = cursor.getInt(totalQuantityColumnIndex);
+
+                    String displayText = ingredientName + " Qty: " + totalQuantity;
+                    shoppingList.get(category).add(displayText);
+                }
             } while (cursor.moveToNext());
         }
 
-        cursor.close();
+        if (cursor != null) {
+            cursor.close();
+        }
+
         return shoppingList;
     }
 
@@ -113,33 +117,67 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT * FROM meals WHERE date BETWEEN date('now') AND date('now', '+7 days') ORDER BY date ASC";
         Cursor cursor = db.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
-            int idIndex = cursor.getColumnIndex("id");
-            int nameIndex = cursor.getColumnIndex("name");
-            int typeIndex = cursor.getColumnIndex("type");
-            int dateIndex = cursor.getColumnIndex("date");
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int idColumnIndex = cursor.getColumnIndex("id");
+                int nameColumnIndex = cursor.getColumnIndex("name");
+                int typeColumnIndex = cursor.getColumnIndex("type");
+                int dateColumnIndex = cursor.getColumnIndex("date");
 
-            if (idIndex != -1 && nameIndex != -1 && typeIndex != -1 && dateIndex != -1) {
-                do {
-                    long id = cursor.getLong(idIndex);
-                    String name = cursor.getString(nameIndex);
-                    String type = cursor.getString(typeIndex);
-                    String date = cursor.getString(dateIndex);
+                if (idColumnIndex != -1 && nameColumnIndex != -1 && typeColumnIndex != -1 && dateColumnIndex != -1) {
+                    long id = cursor.getLong(idColumnIndex);
+                    String name = cursor.getString(nameColumnIndex);
+                    String type = cursor.getString(typeColumnIndex);
+                    String date = cursor.getString(dateColumnIndex);
 
                     Meal meal = new Meal(id, name, type, date);
                     meals.add(meal);
-                } while (cursor.moveToNext());
+                }
+            } while (cursor.moveToNext());
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+
+        return meals;
+    }
+
+    // Retrieve a meal by date and type (e.g., Breakfast, Lunch, Dinner)
+    public Meal getMealByDateAndType(String date, String type) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Meal meal = null;
+
+        String query = "SELECT * FROM meals WHERE date = ? AND type = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{date, type});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            int idColumnIndex = cursor.getColumnIndex("id");
+            int nameColumnIndex = cursor.getColumnIndex("name");
+            int typeColumnIndex = cursor.getColumnIndex("type");
+            int dateColumnIndex = cursor.getColumnIndex("date");
+
+            if (idColumnIndex != -1 && nameColumnIndex != -1 && typeColumnIndex != -1 && dateColumnIndex != -1) {
+                long id = cursor.getLong(idColumnIndex);
+                String name = cursor.getString(nameColumnIndex);
+                String mealType = cursor.getString(typeColumnIndex);
+                String mealDate = cursor.getString(dateColumnIndex);
+
+                meal = new Meal(id, name, mealType, mealDate);
             }
         }
 
-        cursor.close();
-        return meals;
+        if (cursor != null) {
+            cursor.close();
+        }
+
+        return meal;
     }
 
     // Delete a meal and its associated ingredients
     public void deleteMeal(long mealId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("ingredients", "mealId = ?", new String[] { String.valueOf(mealId) });
-        db.delete("meals", "id = ?", new String[] { String.valueOf(mealId) });
+        db.delete("ingredients", "mealId = ?", new String[]{String.valueOf(mealId)});
+        db.delete("meals", "id = ?", new String[]{String.valueOf(mealId)});
     }
 }
