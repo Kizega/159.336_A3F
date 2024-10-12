@@ -53,7 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Insert each ingredient linked to this meal
         if (ingredients != null) {
             for (Ingredient ingredient : ingredients) {
-                addIngredient(mealId, ingredient.getName(), ingredient.getQuantity(), ingredient.getCategory());
+                addIngredient(mealId, capitalizeWords(ingredient.getName()), ingredient.getQuantity(), ingredient.getCategory());
             }
         }
 
@@ -64,7 +64,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("mealId", mealId);
-        values.put("name", name);
+        values.put("name", capitalizeWords(name)); // Capitalize the ingredient name
         values.put("quantity", quantity);
         values.put("category", category);
 
@@ -92,7 +92,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 int totalQuantityColumnIndex = cursor.getColumnIndex("totalQuantity");
 
                 if (nameColumnIndex != -1 && categoryColumnIndex != -1 && totalQuantityColumnIndex != -1) {
-                    String ingredientName = cursor.getString(nameColumnIndex);
+                    // Capitalize ingredient name
+                    String ingredientName = capitalizeWords(cursor.getString(nameColumnIndex));
                     String category = cursor.getString(categoryColumnIndex);
                     int totalQuantity = cursor.getInt(totalQuantityColumnIndex);
 
@@ -126,7 +127,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 if (idColumnIndex != -1 && nameColumnIndex != -1 && typeColumnIndex != -1 && dateColumnIndex != -1) {
                     long id = cursor.getLong(idColumnIndex);
-                    String name = cursor.getString(nameColumnIndex);
+                    String name = capitalizeWords(cursor.getString(nameColumnIndex));
                     String type = cursor.getString(typeColumnIndex);
                     String date = cursor.getString(dateColumnIndex);
 
@@ -159,7 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             if (idColumnIndex != -1 && nameColumnIndex != -1 && typeColumnIndex != -1 && dateColumnIndex != -1) {
                 long id = cursor.getLong(idColumnIndex);
-                String name = cursor.getString(nameColumnIndex);
+                String name = capitalizeWords(cursor.getString(nameColumnIndex));
                 String mealType = cursor.getString(typeColumnIndex);
                 String mealDate = cursor.getString(dateColumnIndex);
 
@@ -179,5 +180,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("ingredients", "mealId = ?", new String[]{String.valueOf(mealId)});
         db.delete("meals", "id = ?", new String[]{String.valueOf(mealId)});
+    }
+
+    // Helper function to capitalize the first letter of each word
+    public String capitalizeWords(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        String[] words = input.toLowerCase().split(" ");
+        StringBuilder capitalizedWords = new StringBuilder();
+
+        for (String word : words) {
+            if (word.length() > 0) {
+                capitalizedWords.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1))
+                        .append(" ");
+            }
+        }
+
+        return capitalizedWords.toString().trim();
     }
 }

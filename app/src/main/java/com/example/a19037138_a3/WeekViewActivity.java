@@ -24,17 +24,20 @@ public class WeekViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_week_view);
 
         weekViewContainer = findViewById(R.id.weekMealContainer);
-        loadWeeklyMeals();
+        loadWeeklyMeals(); // Load meals when activity is created
 
         // Set up the back button functionality
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> {
-            Intent intent = new Intent(WeekViewActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();  // Close current activity
+            goBackToMain(v);
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadWeeklyMeals(); // Ensure meals are reloaded every time the activity is resumed
+    }
 
     private void loadWeeklyMeals() {
         DatabaseHelper db = new DatabaseHelper(this);
@@ -43,8 +46,8 @@ public class WeekViewActivity extends AppCompatActivity {
 
         // Get the next 7 days
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dbDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); // This matches the database format
-        SimpleDateFormat displayDateFormat = new SimpleDateFormat("EEEE d'th' MMMM", Locale.getDefault()); // Display format for UI
+        SimpleDateFormat dbDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); // Format to match the database
+        SimpleDateFormat displayDateFormat = new SimpleDateFormat("EEEE d'th' MMMM", Locale.getDefault()); // Format for UI
 
         for (int i = 0; i < 7; i++) {
             String dbFormattedDate = dbDateFormat.format(calendar.getTime());
@@ -76,7 +79,8 @@ public class WeekViewActivity extends AppCompatActivity {
         View mealIcon = mealItemView.findViewById(R.id.mealIcon);
 
         if (meal != null) {
-            mealNameView.setText(meal.getName());
+            // Capitalize the meal name
+            mealNameView.setText(capitalizeWords(meal.getName()));
 
             switch (mealType) {
                 case "Breakfast":
@@ -90,9 +94,7 @@ public class WeekViewActivity extends AppCompatActivity {
                     break;
             }
 
-            // Add click listener for deletion
             mealItemView.setOnClickListener(v -> showDeleteDialog(meal, db));
-
         } else {
             mealNameView.setText("No " + mealType.toLowerCase() + " allocated");
             switch (mealType) {
@@ -123,12 +125,29 @@ public class WeekViewActivity extends AppCompatActivity {
                 .show();
     }
 
+    // Helper function to capitalize the first letter of each word
+    public String capitalizeWords(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
 
-    // Method to handle back button click
+        String[] words = input.toLowerCase().split(" ");
+        StringBuilder capitalizedWords = new StringBuilder();
+
+        for (String word : words) {
+            if (word.length() > 0) {
+                capitalizedWords.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1))
+                        .append(" ");
+            }
+        }
+
+        return capitalizedWords.toString().trim();
+    }
+
     public void goBackToMain(View view) {
-        // This will finish the current activity and go back to the previous activity (MainActivity)
         Intent intent = new Intent(WeekViewActivity.this, MainActivity.class);
         startActivity(intent);
-        finish(); // Finish this activity to prevent stacking activities
+        finish();
     }
 }
