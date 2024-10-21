@@ -1,10 +1,16 @@
 <resources>
     <string name="app_name">Meal Planner</string>
     <string-array name="meal_type_array">
+        <item>@string/select_meal_time</item>
         <item>Breakfast</item>
         <item>Lunch</item>
         <item>Dinner</item>
     </string-array>
+    <string name="no_meal">No %1$s allocated</string>
+    <string name="delete_meal_title">Delete Meal</string>
+    <string name="delete_meal_message">Are you sure you want to delete %1$s?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
     <string name="btn_add_ingredient">Add Ingredient</string>
     <string name="btn_back">Back</string>
     <string name="btn_add_meal">Add Meal</string>
@@ -23,6 +29,11 @@
     <string name="back">Back</string>
     <string name="meal_icon_description">Meal icon</string>
     <string name="no_meals_message">No meals for the next 7 days.</string>
+    <string name="add_ingredient">Add Ingredient</string>
+    <string name="meal_name_hint">Meal Name</string>
+    <string name="select_date_hint">Select a Date</string>
+    <string name="select_meal_time">Select Meal Time</string>
+    <string name="add_meal">Add Meal</string>
     <string-array name="category_array">
         <item>Vegetables</item>
         <item>Meat</item>

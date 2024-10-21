@@ -6,9 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -144,35 +147,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return meals;
     }
 
-    // Retrieve a meal by date and type (e.g., Breakfast, Lunch, Dinner)
-    public Meal getMealByDateAndType(String date, String type) {
+    // Retrieve meals by date and type (e.g., Breakfast, Lunch, Dinner) - returning up to 3 meals
+    public List<Meal> getMealsByDateAndType(String date, String type) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Meal meal = null;
+        List<Meal> meals = new ArrayList<>();
 
-        String query = "SELECT * FROM meals WHERE date = ? AND type = ?";
+        String query = "SELECT * FROM meals WHERE date = ? AND type = ? LIMIT 3";
         Cursor cursor = db.rawQuery(query, new String[]{date, type});
 
         if (cursor != null && cursor.moveToFirst()) {
-            int idColumnIndex = cursor.getColumnIndex("id");
-            int nameColumnIndex = cursor.getColumnIndex("name");
-            int typeColumnIndex = cursor.getColumnIndex("type");
-            int dateColumnIndex = cursor.getColumnIndex("date");
+            do {
+                int idColumnIndex = cursor.getColumnIndex("id");
+                int nameColumnIndex = cursor.getColumnIndex("name");
+                int typeColumnIndex = cursor.getColumnIndex("type");
+                int dateColumnIndex = cursor.getColumnIndex("date");
 
-            if (idColumnIndex != -1 && nameColumnIndex != -1 && typeColumnIndex != -1 && dateColumnIndex != -1) {
-                long id = cursor.getLong(idColumnIndex);
-                String name = capitalizeWords(cursor.getString(nameColumnIndex));
-                String mealType = cursor.getString(typeColumnIndex);
-                String mealDate = cursor.getString(dateColumnIndex);
+                if (idColumnIndex != -1 && nameColumnIndex != -1 && typeColumnIndex != -1 && dateColumnIndex != -1) {
+                    long id = cursor.getLong(idColumnIndex);
+                    String name = capitalizeWords(cursor.getString(nameColumnIndex));
+                    String mealType = cursor.getString(typeColumnIndex);
+                    String mealDate = cursor.getString(dateColumnIndex);
 
-                meal = new Meal(id, name, mealType, mealDate);
-            }
+                    Meal meal = new Meal(id, name, mealType, mealDate);
+                    meals.add(meal);
+                }
+            } while (cursor.moveToNext());
         }
 
         if (cursor != null) {
             cursor.close();
         }
 
-        return meal;
+        return meals;
     }
 
     // Delete a meal and its associated ingredients
@@ -200,5 +206,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return capitalizedWords.toString().trim();
+    }
+    // Add the new method to delete meals before today's date
+    public void deleteOldMeals() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        // Delete meals before the current date
+        db.execSQL("DELETE FROM ingredients WHERE mealId IN (SELECT id FROM meals WHERE date < ?)", new String[]{currentDate});
+        db.execSQL("DELETE FROM meals WHERE date < ?", new String[]{currentDate});
+    }
+
+    public void clearOldMeals() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Define the current date as "YYYY-MM-DD"
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        // Delete meals that are older than the current date
+        db.delete("meals", "date < ?", new String[]{currentDate});
     }
 }

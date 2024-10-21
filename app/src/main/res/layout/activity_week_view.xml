@@ -1,9 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,7 +14,6 @@
         android:padding="16dp"
         android:background="@android:color/white">
 
-        <!-- Top container with back button and title -->
         <LinearLayout
             android:id="@+id/top_container"
             android:layout_width="match_parent"
@@ -24,7 +25,6 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
 
-            <!-- Back Button -->
             <ImageButton
                 android:id="@+id/back_button"
                 android:layout_width="48dp"
@@ -36,7 +36,6 @@
                 android:backgroundTint="@color/cookie_beige"
                 app:tint="@color/chocolate_brown" />
 
-            <!-- Title -->
             <TextView
                 android:id="@+id/week_meal_plan_title"
                 android:layout_width="0dp"
@@ -50,12 +49,12 @@
                 android:layout_marginStart="16dp" />
         </LinearLayout>
 
-        <!-- The container for meal items -->
         <LinearLayout
             android:id="@+id/weekMealContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:background="@android:color/white" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

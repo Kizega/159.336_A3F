@@ -1,73 +1,145 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
+    <!-- Top container for back button and title -->
     <LinearLayout
+        android:id="@+id/top_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="40dp"
+        android:paddingBottom="24dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
-        <!-- Back Button -->
-        <Button
-            android:id="@+id/backButtonAddMeal"
-            android:layout_width="wrap_content"
+        <!-- Back Button (aligned to the left) -->
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/rounded_button"
+            android:src="@drawable/ic_back"
+            android:contentDescription="@string/back"
+            android:padding="8dp"
+            android:backgroundTint="@color/cookie_beige"
+            app:tint="@color/chocolate_brown" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/add_meal_title"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/btn_back"
-            android:onClick="goBackToMain"/>
-
-        <!-- Meal Name EditText -->
-        <EditText
-            android:id="@+id/mealName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_meal_name"
-            android:inputType="text"
-            android:importantForAccessibility="yes"
-            android:padding="16dp"
-            android:autofillHints="username" /> <!-- Autofill hints for better user experience -->
-
-        <!-- Ingredient Container -->
-        <LinearLayout
-            android:id="@+id/ingredientContainer"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <!-- Add Ingredient Button -->
-        <Button
-            android:id="@+id/addIngredientButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_add_ingredient"
-            android:onClick="addIngredient"
-            android:minHeight="48dp"
-        android:minWidth="64dp" />
-
-        <!-- Spinner for Meal Type -->
-        <Spinner
-            android:id="@+id/mealTypeSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-        android:padding="16dp" />
-
-        <!-- Date Picker -->
-        <DatePicker
-            android:id="@+id/datePicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <!-- Add Meal Button -->
-        <Button
-            android:id="@+id/btnAddMeal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_add_meal"
-            android:onClick="saveMeal"
-            android:minHeight="48dp"
-        android:padding="16dp"
-        android:importantForAccessibility="yes"/>
+            android:layout_weight="1"
+            android:text="@string/add_meal"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/chocolate_brown"
+            android:gravity="center"
+            android:layout_marginStart="16dp"
+            android:contentDescription="@string/add_meal"/>
     </LinearLayout>
-</ScrollView>
+
+    <!-- Scrollable content for meal details -->
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top_container"
+        android:layout_above="@+id/add_meal_button"
+        android:paddingBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Meal name input -->
+            <EditText
+                android:id="@+id/meal_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/meal_name_hint"
+                android:inputType="text"
+                android:autofillHints="name"
+                android:textColor="@color/chocolate_brown"
+                android:textSize="18sp"
+                android:layout_marginBottom="16dp"
+                android:padding="16dp"
+                android:maxLines="1"
+                android:textColorHint="@color/chocolate_brown"/>
+
+            <!-- Meal type spinner, aligned with Meal Name and Date -->
+            <Spinner
+                android:id="@+id/meal_type_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="-8dp"
+                android:layout_marginBottom="16dp"
+                android:entries="@array/meal_type_array"
+                android:padding="16dp" />
+
+            <!-- Selected date with contentDescription -->
+            <TextView
+                android:id="@+id/selected_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/select_date_hint"
+                android:textColor="@color/chocolate_brown"
+                android:textSize="18sp"
+                android:paddingTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:maxLines="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/select_date_hint"/>
+
+            <!-- Dynamic container for ingredients -->
+            <LinearLayout
+                android:id="@+id/ingredient_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="16dp" />
+
+            <!-- Add ingredient button moved below date -->
+            <Button
+                android:id="@+id/add_ingredient_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/add_ingredient"
+                android:background="@drawable/rounded_button"
+                android:textColor="@color/chocolate_brown"
+                android:textSize="16sp"
+                app:backgroundTint="@color/cookie_beige"
+                android:padding="16dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Add meal button at the bottom, moves when more content is added -->
+    <Button
+        android:id="@+id/add_meal_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/rounded_button"
+        android:text="@string/add_meal"
+        android:textColor="@color/chocolate_brown"
+        app:backgroundTint="@color/cookie_beige"
+        android:textSize="18sp"
+        android:maxWidth="300dp"
+        android:padding="16dp"
+        android:contentDescription="@string/add_meal"/>
+
+</RelativeLayout>
