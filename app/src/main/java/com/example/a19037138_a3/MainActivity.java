@@ -12,6 +12,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Delete old meals and ingredients on app launch
+        DatabaseHelper db = new DatabaseHelper(this);
+        db.deleteOldMeals();
+
         // Setup buttons with click listeners
         Button addMealButton = findViewById(R.id.button_add_meal);
         Button weekButton = findViewById(R.id.button_week);

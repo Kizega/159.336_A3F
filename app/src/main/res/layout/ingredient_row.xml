@@ -2,30 +2,54 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:minHeight="48dp">
 
-    <EditText
+    <CheckBox
+        android:id="@+id/ingredientCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/checkbox_ingredient"
+        android:padding="8dp"
+        android:importantForAccessibility="yes" />
+
+    <AutoCompleteTextView
         android:id="@+id/ingredientName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:hint="@string/ingredient_hint"
-        android:inputType="text"
-        android:autofillHints="ingredientName" />
+        android:layout_weight="1"
+        android:hint="@string/ingredient_name_hint"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:padding="8dp"
+        android:importantForAccessibility="yes"
+        android:autofillHints="name"
+        android:maxLines="1"
+        android:ellipsize="end" />
 
     <EditText
         android:id="@+id/ingredientQuantity"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:hint="@string/quantity_hint"
         android:inputType="number"
-        android:autofillHints="ingredientQuantity" />
+        android:hint="@string/quantity_hint"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:padding="8dp"
+        android:importantForAccessibility="yes"
+        android:autofillHints="quantity"
+        android:minWidth="60dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:background="?android:attr/editTextBackground" />
 
-    <Spinner
-        android:id="@+id/ingredientCategory"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:entries="@array/category_array" />
+    <ImageButton
+        android:id="@+id/deleteIngredientButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_delete"
+        android:contentDescription="@string/delete_ingredient"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="8dp"
+        android:importantForAccessibility="yes" />
 </LinearLayout>

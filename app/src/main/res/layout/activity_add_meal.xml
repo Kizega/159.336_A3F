@@ -60,7 +60,7 @@
             android:padding="16dp">
 
             <!-- Meal name input -->
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/meal_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

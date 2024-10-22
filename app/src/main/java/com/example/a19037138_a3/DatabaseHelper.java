@@ -5,14 +5,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "mealPlanner.db";
@@ -24,25 +26,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Create meals table
         db.execSQL("CREATE TABLE meals (id INTEGER PRIMARY KEY, name TEXT, type TEXT, date TEXT)");
-
-        // Create ingredients table with category column
-        db.execSQL("CREATE TABLE ingredients (id INTEGER PRIMARY KEY, mealId INTEGER, name TEXT, quantity TEXT, category TEXT, " +
+        db.execSQL("CREATE TABLE ingredients (id INTEGER PRIMARY KEY, mealId INTEGER, name TEXT, quantity INTEGER, category TEXT, " +
                 "FOREIGN KEY (mealId) REFERENCES meals(id) ON DELETE CASCADE)");
+    }
+
+    public Map<String, List<Ingredient>> getCategorizedIngredients() {
+        Map<String, List<Ingredient>> categorizedIngredients = new HashMap<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM ingredients", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Ingredient ingredient = new Ingredient(
+                        cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("name")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("category")),
+                        cursor.getInt(cursor.getColumnIndexOrThrow("quantity")) // Corrected: quantity as int
+                );
+
+                String category = ingredient.getCategory();
+                categorizedIngredients
+                        .computeIfAbsent(category, k -> new ArrayList<>())
+                        .add(ingredient);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return categorizedIngredients;
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop old tables
         db.execSQL("DROP TABLE IF EXISTS meals");
         db.execSQL("DROP TABLE IF EXISTS ingredients");
-
-        // Recreate tables with new schema
         onCreate(db);
     }
 
-    // Add a meal and return its id (Primary Key)
     public long addMeal(String name, String type, String date, List<Ingredient> ingredients) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -50,128 +72,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("type", type);
         values.put("date", date);
 
-        // Insert the meal and get the mealId
         long mealId = db.insert("meals", null, values);
+        Log.d("DatabaseHelper", "Inserted meal: " + name + ", Type: " + type + ", Date: " + date);
 
-        // Insert each ingredient linked to this meal
         if (ingredients != null) {
             for (Ingredient ingredient : ingredients) {
-                addIngredient(mealId, capitalizeWords(ingredient.getName()), ingredient.getQuantity(), ingredient.getCategory());
+                addIngredient(mealId, ingredient.getName(), ingredient.getQuantity(), ingredient.getCategory());
             }
         }
-
         return mealId;
     }
 
-    public void addIngredient(long mealId, String name, String quantity, String category) {
+
+    public void addIngredient(long mealId, String name, int quantity, String category) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("mealId", mealId);
-        values.put("name", capitalizeWords(name)); // Capitalize the ingredient name
-        values.put("quantity", quantity);
+        values.put("name", capitalizeWords(name));
+        values.put("quantity", quantity); // Store quantity as an integer
         values.put("category", category);
 
         db.insert("ingredients", null, values);
     }
 
-    // Get a categorized shopping list
-    public Map<String, List<String>> getShoppingListByCategory() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Map<String, List<String>> shoppingList = new HashMap<>();
-
-        // Initialize categories
-        shoppingList.put("Vegetables", new ArrayList<>());
-        shoppingList.put("Meat", new ArrayList<>());
-        shoppingList.put("Other", new ArrayList<>());
-
-        // Query to get ingredients grouped by name and category, summing quantities
-        String query = "SELECT name, category, SUM(CAST(quantity AS INTEGER)) as totalQuantity FROM ingredients GROUP BY name, category";
-        Cursor cursor = db.rawQuery(query, null);
-
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                int nameColumnIndex = cursor.getColumnIndex("name");
-                int categoryColumnIndex = cursor.getColumnIndex("category");
-                int totalQuantityColumnIndex = cursor.getColumnIndex("totalQuantity");
-
-                if (nameColumnIndex != -1 && categoryColumnIndex != -1 && totalQuantityColumnIndex != -1) {
-                    // Capitalize ingredient name
-                    String ingredientName = capitalizeWords(cursor.getString(nameColumnIndex));
-                    String category = cursor.getString(categoryColumnIndex);
-                    int totalQuantity = cursor.getInt(totalQuantityColumnIndex);
-
-                    String displayText = ingredientName + " Qty: " + totalQuantity;
-                    shoppingList.get(category).add(displayText);
-                }
-            } while (cursor.moveToNext());
-        }
-
-        if (cursor != null) {
-            cursor.close();
-        }
-
-        return shoppingList;
-    }
-
-    // Get weekly meals
-    public List<Meal> getWeeklyMeals() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        List<Meal> meals = new ArrayList<>();
-
-        String query = "SELECT * FROM meals WHERE date BETWEEN date('now') AND date('now', '+7 days') ORDER BY date ASC";
-        Cursor cursor = db.rawQuery(query, null);
-
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                int idColumnIndex = cursor.getColumnIndex("id");
-                int nameColumnIndex = cursor.getColumnIndex("name");
-                int typeColumnIndex = cursor.getColumnIndex("type");
-                int dateColumnIndex = cursor.getColumnIndex("date");
-
-                if (idColumnIndex != -1 && nameColumnIndex != -1 && typeColumnIndex != -1 && dateColumnIndex != -1) {
-                    long id = cursor.getLong(idColumnIndex);
-                    String name = capitalizeWords(cursor.getString(nameColumnIndex));
-                    String type = cursor.getString(typeColumnIndex);
-                    String date = cursor.getString(dateColumnIndex);
-
-                    Meal meal = new Meal(id, name, type, date);
-                    meals.add(meal);
-                }
-            } while (cursor.moveToNext());
-        }
-
-        if (cursor != null) {
-            cursor.close();
-        }
-
-        return meals;
-    }
-
-    // Retrieve meals by date and type (e.g., Breakfast, Lunch, Dinner) - returning up to 3 meals
     public List<Meal> getMealsByDateAndType(String date, String type) {
         SQLiteDatabase db = this.getReadableDatabase();
         List<Meal> meals = new ArrayList<>();
 
-        String query = "SELECT * FROM meals WHERE date = ? AND type = ? LIMIT 3";
+        String query = "SELECT * FROM meals WHERE date = ? AND type = ?";
         Cursor cursor = db.rawQuery(query, new String[]{date, type});
+
+        Log.d("DatabaseHelper", "Querying meals for Date: " + date + ", Type: " + type);
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                int idColumnIndex = cursor.getColumnIndex("id");
-                int nameColumnIndex = cursor.getColumnIndex("name");
-                int typeColumnIndex = cursor.getColumnIndex("type");
-                int dateColumnIndex = cursor.getColumnIndex("date");
+                long id = cursor.getLong(cursor.getColumnIndexOrThrow("id"));
+                String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                String mealType = cursor.getString(cursor.getColumnIndexOrThrow("type"));
+                String mealDate = cursor.getString(cursor.getColumnIndexOrThrow("date"));
 
-                if (idColumnIndex != -1 && nameColumnIndex != -1 && typeColumnIndex != -1 && dateColumnIndex != -1) {
-                    long id = cursor.getLong(idColumnIndex);
-                    String name = capitalizeWords(cursor.getString(nameColumnIndex));
-                    String mealType = cursor.getString(typeColumnIndex);
-                    String mealDate = cursor.getString(dateColumnIndex);
+                Meal meal = new Meal(id, name, mealType, mealDate);
+                meals.add(meal);
 
-                    Meal meal = new Meal(id, name, mealType, mealDate);
-                    meals.add(meal);
-                }
+                Log.d("DatabaseHelper", "Retrieved Meal: " + name + ", Type: " + mealType + ", Date: " + mealDate);
             } while (cursor.moveToNext());
+        } else {
+            Log.d("DatabaseHelper", "No meals found for Date: " + date + ", Type: " + type);
         }
 
         if (cursor != null) {
@@ -181,14 +127,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return meals;
     }
 
-    // Delete a meal and its associated ingredients
+
+
     public void deleteMeal(long mealId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("ingredients", "mealId = ?", new String[]{String.valueOf(mealId)});
         db.delete("meals", "id = ?", new String[]{String.valueOf(mealId)});
     }
 
-    // Helper function to capitalize the first letter of each word
     public String capitalizeWords(String input) {
         if (input == null || input.isEmpty()) {
             return input;
@@ -198,32 +144,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         StringBuilder capitalizedWords = new StringBuilder();
 
         for (String word : words) {
-            if (word.length() > 0) {
+            if (!word.isEmpty()) {
                 capitalizedWords.append(Character.toUpperCase(word.charAt(0)))
                         .append(word.substring(1))
                         .append(" ");
             }
         }
-
         return capitalizedWords.toString().trim();
     }
-    // Add the new method to delete meals before today's date
+
     public void deleteOldMeals() {
         SQLiteDatabase db = this.getWritableDatabase();
-        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-        // Delete meals before the current date
-        db.execSQL("DELETE FROM ingredients WHERE mealId IN (SELECT id FROM meals WHERE date < ?)", new String[]{currentDate});
-        db.execSQL("DELETE FROM meals WHERE date < ?", new String[]{currentDate});
+        // Get today's date in 'yyyy-MM-dd' format
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime());
+
+        // Delete all ingredients associated with old meals
+        db.execSQL("DELETE FROM ingredients WHERE mealId IN (SELECT id FROM meals WHERE date < ?)", new String[]{today});
+
+        // Delete old meals
+        db.delete("meals", "date < ?", new String[]{today});
     }
 
-    public void clearOldMeals() {
+    public void clearDatabase() {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        // Define the current date as "YYYY-MM-DD"
-        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-
-        // Delete meals that are older than the current date
-        db.delete("meals", "date < ?", new String[]{currentDate});
+        try {
+            db.execSQL("DELETE FROM ingredients");
+            db.execSQL("DELETE FROM meals");
+            Log.d("DatabaseHelper", "All meals and ingredients cleared from the database.");
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "Error clearing the database: ", e);
+        } finally {
+            db.close();
+        }
     }
+
 }

@@ -6,6 +6,12 @@
         <item>Lunch</item>
         <item>Dinner</item>
     </string-array>
+
+        <string name="checkbox_ingredient">Ingredient Selected</string>
+        <string name="ingredient_name_hint">Enter Ingredient Name</string>
+        <string name="delete_ingredient">Delete Ingredient</string>
+
+
     <string name="no_meal">No %1$s allocated</string>
     <string name="delete_meal_title">Delete Meal</string>
     <string name="delete_meal_message">Are you sure you want to delete %1$s?</string>
@@ -34,6 +40,7 @@
     <string name="select_date_hint">Select a Date</string>
     <string name="select_meal_time">Select Meal Time</string>
     <string name="add_meal">Add Meal</string>
+    <string name="arrow_icon">arrow</string>
     <string-array name="category_array">
         <item>Vegetables</item>
         <item>Meat</item>

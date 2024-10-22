@@ -4,14 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.Locale;
 public class WeekViewActivity extends AppCompatActivity {
 
     private LinearLayout weekViewContainer;
+    private static final String TAG = "WeekViewActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +29,8 @@ public class WeekViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_week_view);
 
         weekViewContainer = findViewById(R.id.weekMealContainer);
-
         ImageButton backButton = findViewById(R.id.back_button);
+
         backButton.setOnClickListener(v -> goBackToMain());
 
         loadWeeklyMeals();
@@ -51,6 +53,8 @@ public class WeekViewActivity extends AppCompatActivity {
             String dbFormattedDate = dbDateFormat.format(calendar.getTime());
             String displayFormattedDate = displayDateFormat.format(calendar.getTime());
 
+            Log.d(TAG, "Loading meals for date: " + dbFormattedDate);
+
             View dateContainer = LayoutInflater.from(this).inflate(R.layout.date_container, weekViewContainer, false);
             TextView mealDateView = dateContainer.findViewById(R.id.mealDate);
             LinearLayout mealsForTheDayContainer = dateContainer.findViewById(R.id.mealsForTheDayContainer);
@@ -71,39 +75,40 @@ public class WeekViewActivity extends AppCompatActivity {
     }
 
     private void displayMealForSlot(String date, String mealType, LinearLayout parent) {
-        try (DatabaseHelper db = new DatabaseHelper(this)) {
-            List<Meal> meals = db.getMealsByDateAndType(date, mealType);
+        DatabaseHelper db = new DatabaseHelper(this);
+        List<Meal> meals = db.getMealsByDateAndType(date, mealType);
 
-            View mealItemView = LayoutInflater.from(this).inflate(R.layout.meal_item_layout, parent, false);
-            TextView mealNameView = mealItemView.findViewById(R.id.mealName);
-            View mealIcon = mealItemView.findViewById(R.id.mealIcon);
+        View mealItemView = LayoutInflater.from(this).inflate(R.layout.meal_item_layout, parent, false);
+        TextView mealNameView = mealItemView.findViewById(R.id.mealName);
+        ImageView mealIcon = mealItemView.findViewById(R.id.mealIcon);
 
-            switch (mealType) {
-                case "Breakfast":
-                    mealIcon.setBackgroundResource(R.drawable.ic_breakfast_icon);
-                    break;
-                case "Lunch":
-                    mealIcon.setBackgroundResource(R.drawable.ic_lunch_icon);
-                    break;
-                case "Dinner":
-                    mealIcon.setBackgroundResource(R.drawable.ic_dinner_icon);
-                    break;
-            }
-
-            if (!meals.isEmpty()) {
-                StringBuilder mealNamesBuilder = new StringBuilder();
-                for (Meal meal : meals) {
-                    mealNamesBuilder.append(meal.getName()).append("\n");
-                }
-                mealNameView.setText(mealNamesBuilder.toString().trim());
-
-                mealItemView.setOnClickListener(v -> showDeleteDialog(meals.get(0)));
-            } else {
-                mealNameView.setText(getString(R.string.no_meal, mealType.toLowerCase()));
-            }
-
-            parent.addView(mealItemView);
+        switch (mealType) {
+            case "Breakfast":
+                mealIcon.setImageResource(R.drawable.ic_breakfast_icon);
+                break;
+            case "Lunch":
+                mealIcon.setImageResource(R.drawable.ic_lunch_icon);
+                break;
+            case "Dinner":
+                mealIcon.setImageResource(R.drawable.ic_dinner_icon);
+                break;
+            default:
+                mealIcon.setImageResource(android.R.drawable.ic_menu_help); // Default icon
+                break;
         }
+
+        if (!meals.isEmpty()) {
+            StringBuilder mealNamesBuilder = new StringBuilder();
+            for (Meal meal : meals) {
+                mealNamesBuilder.append(meal.getName()).append("\n");
+            }
+            mealNameView.setText(mealNamesBuilder.toString().trim());
+            mealItemView.setOnClickListener(v -> showDeleteDialog(meals.get(0)));
+        } else {
+            mealNameView.setText(getString(R.string.no_meal, mealType.toLowerCase()));
+        }
+
+        parent.addView(mealItemView);
     }
 
     private void showDeleteDialog(Meal meal) {
@@ -111,10 +116,9 @@ public class WeekViewActivity extends AppCompatActivity {
                 .setTitle(R.string.delete_meal_title)
                 .setMessage(getString(R.string.delete_meal_message, meal.getName()))
                 .setPositiveButton(R.string.delete, (dialog, which) -> {
-                    try (DatabaseHelper db = new DatabaseHelper(this)) {
-                        db.deleteMeal(meal.getId());
-                        loadWeeklyMeals();
-                    }
+                    DatabaseHelper db = new DatabaseHelper(this);
+                    db.deleteMeal(meal.getId());
+                    loadWeeklyMeals();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
