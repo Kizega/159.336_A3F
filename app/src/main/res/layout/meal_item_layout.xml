@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -7,19 +10,20 @@
     android:background="@android:color/white"
     android:gravity="center_vertical">
 
-    <!-- Meal Icon -->
+    <!-- Meal Icon with improved tint and contrast -->
     <ImageView
         android:id="@+id/mealIcon"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginEnd="16dp"
-        android:contentDescription="@string/meal_icon_description"
         android:background="@drawable/rounded_button"
-        android:backgroundTint="@color/cookie_beige"
+        android:contentDescription="@string/meal_icon_description"
         android:scaleType="centerInside"
-        android:tint="@android:color/black" />
+        app:backgroundTint="@color/cookie_beige"
+        app:tint="@color/chocolate_brown"
+        tools:ignore="ImageContrastCheck" />
 
-    <!-- Meal Name -->
+    <!-- Meal Name TextView with proper formatting -->
     <TextView
         android:id="@+id/mealName"
         android:layout_width="wrap_content"

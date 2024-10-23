@@ -1,5 +1,9 @@
 <resources>
+
+    <!-- Application Name -->
     <string name="app_name">Meal Planner</string>
+
+    <!-- Meal Types -->
     <string-array name="meal_type_array">
         <item>@string/select_meal_time</item>
         <item>Breakfast</item>
@@ -7,43 +11,72 @@
         <item>Dinner</item>
     </string-array>
 
-        <string name="checkbox_ingredient">Ingredient Selected</string>
-        <string name="ingredient_name_hint">Enter Ingredient Name</string>
-        <string name="delete_ingredient">Delete Ingredient</string>
-
-
-    <string name="no_meal">No %1$s allocated</string>
-    <string name="delete_meal_title">Delete Meal</string>
-    <string name="delete_meal_message">Are you sure you want to delete %1$s?</string>
-    <string name="delete">Delete</string>
-    <string name="cancel">Cancel</string>
-    <string name="btn_add_ingredient">Add Ingredient</string>
-    <string name="btn_back">Back</string>
-    <string name="btn_add_meal">Add Meal</string>
-    <string name="hint_meal_name">Meal Name</string>
-    <string name="date_prefix">Date: </string>
-    <string name="no_meals">No meals for the next 7 days.</string>
-    <string name="ingredient_hint">Ingredient</string>
-    <string name="quantity_hint">Quantity</string>
-    <string name="label_today">Today</string>
-    <string name="label_week">Week</string>
-    <string name="label_shopping_list">Shopping List</string>
-    <string name="label_add_meal">Add Meal</string>
-    <string name="delishimo_logo_description">Delishimo Logo</string>
-    <string name="weeks_meal_plan">Week\'s Meal Plan</string>
-    <string name="shopping_list">Shopping List</string>
-    <string name="back">Back</string>
-    <string name="meal_icon_description">Meal icon</string>
-    <string name="no_meals_message">No meals for the next 7 days.</string>
-    <string name="add_ingredient">Add Ingredient</string>
-    <string name="meal_name_hint">Meal Name</string>
-    <string name="select_date_hint">Select a Date</string>
-    <string name="select_meal_time">Select Meal Time</string>
-    <string name="add_meal">Add Meal</string>
-    <string name="arrow_icon">arrow</string>
+    <!-- Category Arrays -->
     <string-array name="category_array">
+        <item>All</item>
         <item>Vegetables</item>
         <item>Meat</item>
         <item>Other</item>
     </string-array>
+
+    <string-array name="category_no_all">
+        <item>Vegetables</item>
+        <item>Meat</item>
+        <item>Other</item>
+    </string-array>
+
+    <!-- Ingredient and Meal Actions -->
+    <string name="checkbox_ingredient">Ingredient Selected</string>
+    <string name="ingredient_name_hint">Enter Ingredient Name</string>
+    <string name="delete_ingredient">Delete Ingredient</string>
+    <string name="quantity_hint">Quantity</string>
+    <string name="ingredient_hint">Ingredient</string>
+    <string name="btn_add_ingredient">Add Ingredient</string>
+    <string name="btn_add_meal">Add Meal</string>
+    <string name="add_ingredient">Add Ingredient</string>
+    <string name="ingredient_name">Ingredient Name</string>
+    <string name="ingredient_quantity">Quantity</string>
+    <string name="ingredient_category">ingredient_category</string>
+
+    <!-- Meal Labels -->
+    <string name="meal_name_hint">Meal Name</string>
+    <string name="select_meal_time">Select Meal Time</string>
+    <string name="select_date_hint">Select a Date</string>
+    <string name="meal_date">Meal Date</string>
+    <string name="meal_icon_description">Meal icon</string>
+    <string name="quantity_format">Qty: %1$d</string>
+
+    <!-- Notifications and Warnings -->
+    <string name="no_meals">No meals for the next 7 days.</string>
+    <string name="no_meals_message">No meals for the next 7 days.</string>
+    <string name="no_meal">No %1$s allocated</string>
+
+    <!-- Dialog Texts -->
+    <string name="delete_meal_title">Delete Meal</string>
+    <string name="delete_meal_message">Are you sure you want to delete %1$s?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Button Labels -->
+    <string name="btn_back">Back</string>
+    <string name="back">Back</string>
+
+    <!-- Navigation Labels -->
+    <string name="label_add_meal">Add Meal</string>
+    <string name="label_today">Today</string>
+    <string name="label_week">Week</string>
+    <string name="label_shopping_list">Shopping List</string>
+    <string name="shopping_list">Shopping List</string>
+    <string name="weeks_meal_plan">Week\'s Meal Plan</string>
+
+    <!-- Miscellaneous -->
+    <string name="date_prefix">Date: </string>
+    <string name="arrow_icon">arrow</string>
+    <string name="add_item">add item</string>
+    <string name="delishimo_logo_description">Delishimo Logo</string>
+    <string name="sort_by_name">Sort by Name</string>
+    <string name="sort_by_quantity">Sort by Quantity</string>
+    <string name="share_list">Share List</string>
+    <string name="add_meal">add meal\n</string>
+
 </resources>

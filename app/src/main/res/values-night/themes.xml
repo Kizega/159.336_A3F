@@ -1,7 +1,19 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<resources>
+    <!-- Dark mode-specific overrides -->
     <style name="Base.Theme._19037138_A3" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryVariant">@color/chocolate_brown_night</item>
+        <item name="colorSecondary">@color/white</item>
+
+        <!-- Dark mode window background -->
+        <item name="android:windowBackground">@android:color/black</item>
+
+        <!-- Text Colors for Dark Mode -->
+        <item name="android:textColorPrimary">@color/cookie_beige_night</item>
+        <item name="android:textColorSecondary">@color/white</item>
+
+        <!-- Navigation Bar and Status Bar -->
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/chocolate_brown_night</item>
     </style>
 </resources>

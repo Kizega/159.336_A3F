@@ -1,0 +1,28 @@
+<!--
+    A menu resource defining options for sorting and sharing in the app.
+    Each item represents an actionable choice for the user.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Sort by Name: Allows users to sort the ingredient list alphabetically.
+    -->
+    <item
+        android:id="@+id/sort_by_name"
+        android:title="@string/sort_by_name" />
+
+    <!--
+        Sort by Quantity: Allows users to sort ingredients by quantity in ascending or descending order.
+    -->
+    <item
+        android:id="@+id/sort_by_quantity"
+        android:title="@string/sort_by_quantity" />
+
+    <!--
+        @TODO Share List: Provides an option to share the current list with others via available sharing apps.
+    -->
+    <item
+        android:id="@+id/share_list"
+        android:title="@string/share_list" />
+
+</menu>

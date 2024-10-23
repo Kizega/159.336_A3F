@@ -4,10 +4,8 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,6 +13,7 @@ import java.util.Locale;
 
 public class AddMealActivity extends AppCompatActivity {
 
+    // UI Components
     private EditText mealNameEditText;
     private Spinner mealTypeSpinner;
     private TextView selectedDateTextView;
@@ -22,34 +21,27 @@ public class AddMealActivity extends AppCompatActivity {
     private Button addIngredientButton;
     private LinearLayout ingredientContainer;
 
-    private Calendar selectedDateCalendar = Calendar.getInstance();
-    private ArrayList<Ingredient> ingredientsList = new ArrayList<>();
+    // Calendar for storing the selected date
+    private final Calendar selectedDateCalendar = Calendar.getInstance();
+
+    // List to store ingredients added to the meal
+    private final ArrayList<Ingredient> ingredientsList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_meal);
 
-        // Initialize UI elements
-        mealNameEditText = findViewById(R.id.meal_name);
-        mealTypeSpinner = findViewById(R.id.meal_type_spinner);
-        selectedDateTextView = findViewById(R.id.selected_date);
-        addMealButton = findViewById(R.id.add_meal_button);
-        addIngredientButton = findViewById(R.id.add_ingredient_button);
-        ingredientContainer = findViewById(R.id.ingredient_container);
-        ImageButton backButton = findViewById(R.id.back_button);
+        // Initialize UI components
+        initializeUI();
 
-        // Set up back button to return to MainActivity
-        backButton.setOnClickListener(v -> {
-            Intent intent = new Intent(AddMealActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        });
+        // Set the back button's click listener to navigate back to MainActivity
+        setBackButtonListener();
 
-        // Show date picker dialog on clicking the date field
+        // Set listener to show date picker when date field is clicked
         selectedDateTextView.setOnClickListener(v -> showDatePickerDialog());
 
-        // Add new ingredient field dynamically when the button is clicked
+        // Set listener to dynamically add new ingredient fields
         addIngredientButton.setOnClickListener(v -> {
             if (validateLastIngredientField()) {
                 addIngredientField();
@@ -58,21 +50,46 @@ public class AddMealActivity extends AppCompatActivity {
             }
         });
 
-        // Add meal to the database on button click
-        addMealButton.setOnClickListener(v -> {
-            String mealName = mealNameEditText.getText().toString();
-            String mealType = mealTypeSpinner.getSelectedItem().toString();
+        // Add the meal to the database when the "Add Meal" button is clicked
+        addMealButton.setOnClickListener(v -> addMeal());
+    }
 
-            // Format the selected date to 'yyyy-MM-dd' for database storage
-            SimpleDateFormat dbDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            String formattedDate = dbDateFormat.format(selectedDateCalendar.getTime());
+    // Initialize all UI components
+    private void initializeUI() {
+        mealNameEditText = findViewById(R.id.meal_name);
+        mealTypeSpinner = findViewById(R.id.meal_type_spinner);
+        selectedDateTextView = findViewById(R.id.selected_date);
+        addMealButton = findViewById(R.id.add_meal_button);
+        addIngredientButton = findViewById(R.id.add_ingredient_button);
+        ingredientContainer = findViewById(R.id.ingredient_container);
+    }
 
-            if (mealName.isEmpty() || formattedDate.isEmpty() || mealType.equals("Select Meal Time")) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                return;
-            }
+    // Set the listener for the back button to navigate to MainActivity
+    private void setBackButtonListener() {
+        ImageButton backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> {
+            Intent intent = new Intent(AddMealActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
+    }
 
-            DatabaseHelper db = new DatabaseHelper(this);
+    // Add a new meal to the database
+    private void addMeal() {
+        String mealName = mealNameEditText.getText().toString();
+        String mealType = mealTypeSpinner.getSelectedItem().toString();
+
+        // Format the selected date to 'yyyy-MM-dd'
+        String formattedDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                .format(selectedDateCalendar.getTime());
+
+        if (mealName.isEmpty() || formattedDate.isEmpty() || mealType.equals("Select Meal Time")) {
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Save the meal and its ingredients to the database
+        try (DatabaseHelper db = new DatabaseHelper(this)) {
             long mealId = db.addMeal(mealName, mealType, formattedDate, ingredientsList);
 
             if (mealId != -1) {
@@ -83,15 +100,27 @@ public class AddMealActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Error adding meal", Toast.LENGTH_SHORT).show();
             }
-        });
+        }
     }
 
-    // Dynamically add an ingredient field
+    // Dynamically add a new ingredient field
     private void addIngredientField() {
         LinearLayout ingredientLayout = new LinearLayout(this);
         ingredientLayout.setOrientation(LinearLayout.VERTICAL);
 
-        // First row with name and quantity
+        LinearLayout firstRow = createIngredientRow();
+        LinearLayout secondRow = createCategoryRow(ingredientLayout);
+
+        ingredientLayout.addView(firstRow);
+        ingredientLayout.addView(secondRow);
+
+        ingredientContainer.addView(ingredientLayout);
+
+        ingredientsList.add(new Ingredient(0, "", "Other", 1));
+    }
+
+    // Create the first row for ingredient name and quantity input
+    private LinearLayout createIngredientRow() {
         LinearLayout firstRow = new LinearLayout(this);
         firstRow.setOrientation(LinearLayout.HORIZONTAL);
 
@@ -110,7 +139,11 @@ public class AddMealActivity extends AppCompatActivity {
         firstRow.addView(ingredientNameEditText);
         firstRow.addView(ingredientQuantityEditText);
 
-        // Second row with category dropdown and delete button
+        return firstRow;
+    }
+
+    // Create the second row with a category spinner and delete button
+    private LinearLayout createCategoryRow(LinearLayout ingredientLayout) {
         LinearLayout secondRow = new LinearLayout(this);
         secondRow.setOrientation(LinearLayout.HORIZONTAL);
 
@@ -123,34 +156,29 @@ public class AddMealActivity extends AppCompatActivity {
 
         ImageButton deleteButton = new ImageButton(this);
         deleteButton.setImageResource(android.R.drawable.ic_delete);
-        deleteButton.setBackground(null); // Remove default background
+        deleteButton.setBackground(null);
         deleteButton.setPadding(16, 16, 16, 16);
-
-        // Set up delete action
-        deleteButton.setOnClickListener(v -> {
-            int index = ingredientContainer.indexOfChild(ingredientLayout);
-            ingredientContainer.removeView(ingredientLayout);
-            if (index != -1) {
-                ingredientsList.remove(index);
-            }
-            Toast.makeText(this, "Ingredient removed", Toast.LENGTH_SHORT).show();
-        });
+        deleteButton.setOnClickListener(v -> removeIngredient(ingredientLayout));
 
         secondRow.addView(categorySpinner);
         secondRow.addView(deleteButton);
 
-        // Add rows to the ingredient layout
-        ingredientLayout.addView(firstRow);
-        ingredientLayout.addView(secondRow);
-
-        // Add the complete ingredient layout to the container
-        ingredientContainer.addView(ingredientLayout);
-
-        // Add a new ingredient with default values to the list
-        ingredientsList.add(new Ingredient(0, "", "Other", 1));
+        return secondRow;
     }
 
-    // Validate the last ingredient field to ensure it is filled
+    // Remove the selected ingredient field from the list and the UI
+    private void removeIngredient(LinearLayout ingredientLayout) {
+        int index = ingredientContainer.indexOfChild(ingredientLayout);
+        ingredientContainer.removeView(ingredientLayout);
+
+        if (index != -1) {
+            ingredientsList.remove(index);
+        }
+
+        Toast.makeText(this, "Ingredient removed", Toast.LENGTH_SHORT).show();
+    }
+
+    // Validate that the last added ingredient field is filled
     private boolean validateLastIngredientField() {
         int childCount = ingredientContainer.getChildCount();
         if (childCount == 0) return true;
@@ -163,7 +191,7 @@ public class AddMealActivity extends AppCompatActivity {
         return !nameField.getText().toString().isEmpty() && !quantityField.getText().toString().isEmpty();
     }
 
-    // Show date picker dialog for selecting the date
+    // Show a date picker dialog to select a date
     private void showDatePickerDialog() {
         int year = selectedDateCalendar.get(Calendar.YEAR);
         int month = selectedDateCalendar.get(Calendar.MONTH);
@@ -179,7 +207,7 @@ public class AddMealActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    // Update the selected date text view with the selected date
+    // Update the displayed date with the selected date
     private void updateSelectedDateText() {
         SimpleDateFormat displayFormat = new SimpleDateFormat("EEE, MMM d, yyyy", Locale.getDefault());
         String formattedDate = displayFormat.format(selectedDateCalendar.getTime());

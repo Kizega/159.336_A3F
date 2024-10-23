@@ -13,33 +13,34 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Delete old meals and ingredients on app launch
-        DatabaseHelper db = new DatabaseHelper(this);
-        db.deleteOldMeals();
+        try (DatabaseHelper db = new DatabaseHelper(this)) {
+            db.deleteOldMeals();  // Clean up outdated data
+        }
 
-        // Setup buttons with click listeners
+        // Set up buttons with click listeners
         Button addMealButton = findViewById(R.id.button_add_meal);
         Button weekButton = findViewById(R.id.button_week);
         Button shoppingListButton = findViewById(R.id.button_shopping_list);
 
-        // Set up click listeners for each button
+        // Open activities when buttons are clicked
         addMealButton.setOnClickListener(v -> openAddMeal());
         weekButton.setOnClickListener(v -> openWeekView());
         shoppingListButton.setOnClickListener(v -> openShoppingList());
     }
 
-    // Opens the AddMealActivity
+    // Opens AddMealActivity
     private void openAddMeal() {
         Intent intent = new Intent(this, AddMealActivity.class);
         startActivity(intent);
     }
 
-    // Opens the WeekViewActivity
+    // Opens WeekViewActivity
     private void openWeekView() {
         Intent intent = new Intent(this, WeekViewActivity.class);
         startActivity(intent);
     }
 
-    // Opens the ShoppingListActivity
+    // Opens ShoppingListActivity
     private void openShoppingList() {
         Intent intent = new Intent(this, ShoppingListActivity.class);
         startActivity(intent);

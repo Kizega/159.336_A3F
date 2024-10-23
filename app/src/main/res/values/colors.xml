@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="cookie_beige">#E3B98B</color>
     <color name="chocolate_brown">#5B3A29</color>
+    <color name="cookie_beige_night">#A1887F</color>
+    <color name="chocolate_brown_night">#3E2723</color>
 </resources>

@@ -17,7 +17,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
-        <!-- Back Button (aligned to the left) -->
+        <!-- Back Button -->
         <ImageButton
             android:id="@+id/back_button"
             android:layout_width="48dp"
@@ -40,8 +40,7 @@
             android:textStyle="bold"
             android:textColor="@color/chocolate_brown"
             android:gravity="center"
-            android:layout_marginStart="16dp"
-            android:contentDescription="@string/add_meal"/>
+            android:layout_marginStart="16dp" />
     </LinearLayout>
 
     <!-- Scrollable content for meal details -->
@@ -72,19 +71,19 @@
                 android:layout_marginBottom="16dp"
                 android:padding="16dp"
                 android:maxLines="1"
-                android:textColorHint="@color/chocolate_brown"/>
+                android:textColorHint="@color/chocolate_brown" />
 
-            <!-- Meal type spinner, aligned with Meal Name and Date -->
+            <!-- Meal type spinner -->
             <Spinner
                 android:id="@+id/meal_type_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="-8dp"
+                android:layout_marginStart="-8dp"
                 android:layout_marginBottom="16dp"
                 android:entries="@array/meal_type_array"
                 android:padding="16dp" />
 
-            <!-- Selected date with contentDescription -->
+            <!-- Selected date -->
             <TextView
                 android:id="@+id/selected_date"
                 android:layout_width="match_parent"
@@ -98,8 +97,7 @@
                 android:padding="16dp"
                 android:maxLines="1"
                 android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="@string/select_date_hint"/>
+                android:focusable="true" />
 
             <!-- Dynamic container for ingredients -->
             <LinearLayout
@@ -109,7 +107,7 @@
                 android:orientation="vertical"
                 android:paddingBottom="16dp" />
 
-            <!-- Add ingredient button moved below date -->
+            <!-- Add ingredient button -->
             <Button
                 android:id="@+id/add_ingredient_button"
                 android:layout_width="wrap_content"
@@ -120,12 +118,11 @@
                 android:textColor="@color/chocolate_brown"
                 android:textSize="16sp"
                 app:backgroundTint="@color/cookie_beige"
-                android:padding="16dp"/>
-
+                android:padding="16dp" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- Add meal button at the bottom, moves when more content is added -->
+    <!-- Add meal button at the bottom -->
     <Button
         android:id="@+id/add_meal_button"
         android:layout_width="wrap_content"
@@ -139,7 +136,5 @@
         app:backgroundTint="@color/cookie_beige"
         android:textSize="18sp"
         android:maxWidth="300dp"
-        android:padding="16dp"
-        android:contentDescription="@string/add_meal"/>
-
+        android:padding="16dp" />
 </RelativeLayout>

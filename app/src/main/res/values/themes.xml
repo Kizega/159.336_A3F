@@ -1,9 +1,22 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<resources>
+    <!-- Base application theme -->
     <style name="Base.Theme._19037138_A3" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+        <item name="colorPrimary">@color/cookie_beige</item>
+        <item name="colorPrimaryVariant">@color/chocolate_brown</item>
+        <item name="colorSecondary">@color/black</item>
 
-    <style name="Theme._19037138_A3" parent="Base.Theme._19037138_A3" />
+        <!-- Default window background -->
+        <item name="android:windowBackground">@android:color/white</item>
+
+        <!-- Text Colors -->
+        <item name="android:textColorPrimary">@color/chocolate_brown</item>
+        <item name="android:textColorSecondary">@color/cookie_beige</item>
+
+        <!-- Ripple Effect -->
+        <item name="android:colorControlHighlight">@color/cookie_beige</item>
+
+        <!-- Navigation Bar and Status Bar -->
+        <item name="android:statusBarColor">@color/chocolate_brown</item>
+        <item name="android:navigationBarColor">@color/black</item>
+    </style>
 </resources>
