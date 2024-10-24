@@ -3,7 +3,6 @@ package com.example.a19037138_a3;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -11,31 +10,34 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
-import java.util.List;
+
 import android.widget.ArrayAdapter;
-import androidx.appcompat.widget.SearchView;
 
 public class ShoppingListActivity extends AppCompatActivity
         implements AddIngredientDialog.AddIngredientListener, ShoppingListAdapter.OnIngredientDeleteListener {
 
-    private static final String TAG = "ShoppingListActivity";
-    private final List<Ingredient> ingredientList = new ArrayList<>();
+    private ShoppingListViewModel viewModel; // ViewModel to manage data
     private ShoppingListAdapter adapter;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
 
+        viewModel = new ViewModelProvider(this).get(ShoppingListViewModel.class);
+
         setupRecyclerView();
         setupCategorySpinner();
-        setupSwipeToDelete(findViewById(R.id.recyclerView));
+        setupSwipeToDelete();
         setupSearchFunctionality();
 
         FloatingActionButton fab = findViewById(R.id.fab_add_item);
@@ -44,15 +46,18 @@ public class ShoppingListActivity extends AppCompatActivity
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> goBackToMain());
 
-        loadShoppingList();
-        filterByCategory(getSelectedCategory());
+        observeData();
     }
 
+    // Observes changes in the ingredient list from the ViewModel
+    private void observeData() {
+        viewModel.getIngredients().observe(this, ingredients -> adapter.updateList(new ArrayList<>(ingredients)));
 
-    // Configures the category filter spinner
+        viewModel.loadShoppingList(getSelectedCategory());
+    }
+
     private void setupCategorySpinner() {
         Spinner categorySpinner = findViewById(R.id.category_spinner);
-
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this, R.array.category_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -63,14 +68,14 @@ public class ShoppingListActivity extends AppCompatActivity
             public void onItemSelected(@Nullable AdapterView<?> parent, @Nullable View view, int position, long id) {
                 if (parent != null) {
                     String selectedCategory = parent.getItemAtPosition(position).toString();
-                    filterByCategory(selectedCategory);
+                    viewModel.loadShoppingList(selectedCategory);
                     saveSelectedCategory(selectedCategory);
                 }
             }
 
             @Override
             public void onNothingSelected(@Nullable AdapterView<?> parent) {
-                filterByCategory("All");
+                viewModel.loadShoppingList("All");
             }
         });
 
@@ -81,20 +86,14 @@ public class ShoppingListActivity extends AppCompatActivity
         }
     }
 
-    // Filters ingredients by category
-    private void filterByCategory(String category) {
-        try (DatabaseHelper db = new DatabaseHelper(this)) {
-            List<Ingredient> filteredList = category.equalsIgnoreCase("All")
-                    ? db.getAllIngredients()
-                    : db.getIngredientsByCategory(category);
-            adapter.updateList(filteredList);
-        } catch (Exception e) {
-            Log.e(TAG, "Error filtering ingredients", e);
-        }
+    private void setupRecyclerView() {
+        recyclerView = findViewById(R.id.recyclerView);
+        adapter = new ShoppingListAdapter(new ArrayList<>(), this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
     }
 
-    // Sets up swipe-to-delete functionality
-    private void setupSwipeToDelete(RecyclerView recyclerView) {
+    private void setupSwipeToDelete() {
         ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -103,138 +102,75 @@ public class ShoppingListActivity extends AppCompatActivity
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
-                Ingredient ingredient = ingredientList.get(position);
+                // Use getBindingAdapterPosition() to handle the position correctly
+                int position = viewHolder.getBindingAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    Ingredient ingredient = adapter.getIngredientAt(position);
 
-                try (DatabaseHelper db = new DatabaseHelper(ShoppingListActivity.this)) {
-                    db.deleteIngredient(ingredient.getId());
-                    ingredientList.remove(position);
-                    adapter.notifyItemRemoved(position);
-
+                    viewModel.deleteIngredient(ingredient);
                     Snackbar.make(recyclerView, "Item removed", Snackbar.LENGTH_LONG)
-                            .setAction("UNDO", v -> {
-                                ingredientList.add(position, ingredient);
-                                adapter.notifyItemInserted(position);
-                            }).show();
-                } catch (Exception e) {
-                    Log.e(TAG, "Error deleting ingredient", e);
+                            .setAction("UNDO", v -> viewModel.undoDelete(ingredient))
+                            .show();
                 }
             }
         };
         new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
     }
 
-    // Sets up the RecyclerView
-    private void setupRecyclerView() {
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        adapter = new ShoppingListAdapter(ingredientList, this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
 
-        loadShoppingList();
+    private void setupSearchFunctionality() {
+        SearchView searchView = findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                viewModel.searchIngredients(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                viewModel.searchIngredients(newText);
+                return false;
+            }
+        });
     }
 
-    // Loads all ingredients from the database
-    private void loadShoppingList() {
-        try (DatabaseHelper db = new DatabaseHelper(this)) {
-            ingredientList.clear();
-            ingredientList.addAll(db.getAllIngredients());
-            adapter.updateList(new ArrayList<>(ingredientList));
-        } catch (Exception e) {
-            Log.e(TAG, "Error loading shopping list", e);
-        }
-    }
-
-    // Displays the dialog to add a new ingredient
     private void showAddIngredientDialog() {
         AddIngredientDialog dialog = new AddIngredientDialog();
         dialog.show(getSupportFragmentManager(), "AddIngredientDialog");
     }
 
-    // Returns to the main activity
     private void goBackToMain() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
 
-    // Saves the selected category to SharedPreferences
     private void saveSelectedCategory(String category) {
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
         prefs.edit().putString("selected_category", category).apply();
     }
 
-    // Retrieves the selected category from SharedPreferences
     private String getSelectedCategory() {
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-        return prefs.getString("selected_category", "");
+        return prefs.getString("selected_category", "All");
     }
 
-    // Adds a new ingredient to the list or updates an existing one
     @Override
     public void onIngredientAdded(Ingredient newIngredient) {
-        try (DatabaseHelper db = new DatabaseHelper(this)) {
-            String capitalizedName = db.capitalizeWord(newIngredient.getName());
-            boolean ingredientExists = false;
-
-            for (Ingredient ingredient : ingredientList) {
-                if (ingredient.getName().equalsIgnoreCase(capitalizedName) &&
-                        ingredient.getCategory().equalsIgnoreCase(newIngredient.getCategory())) {
-                    int updatedQuantity = ingredient.getQuantity() + newIngredient.getQuantity();
-                    ingredient.setQuantity(updatedQuantity);
-                    db.updateIngredient(ingredient);
-                    ingredientExists = true;
-                    break;
-                }
-            }
-
-            if (!ingredientExists) {
-                db.addIngredient(0, capitalizedName, newIngredient.getQuantity(), newIngredient.getCategory());
-            }
-
-            loadShoppingList();
-        } catch (Exception e) {
-            Log.e(TAG, "Error adding ingredient", e);
-        }
+        viewModel.addOrUpdateIngredient(newIngredient);
     }
 
-    // Deletes an ingredient from the list and database
     @Override
     public void onIngredientDelete(Ingredient ingredient) {
-        try (DatabaseHelper db = new DatabaseHelper(this)) {
-            db.deleteIngredient(ingredient.getId());
-            ingredientList.remove(ingredient);
-            adapter.updateList(new ArrayList<>(ingredientList));
-        } catch (Exception e) {
-            Log.e(TAG, "Error deleting ingredient", e);
-        }
+        viewModel.deleteIngredient(ingredient);
     }
 
-    // Filters the ingredients by search query
-    private void filterBySearch(String query) {
-        try (DatabaseHelper db = new DatabaseHelper(this)) {
-            List<Ingredient> filteredList = db.getIngredientsByName(query);
-            adapter.updateList(filteredList);
-        } catch (Exception e) {
-            Log.e(TAG, "Error searching ingredients", e);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (recyclerView != null) {
+            recyclerView.setAdapter(null);  // Release adapter to prevent memory leaks
         }
-    }
-
-    // Sets up search functionality for the shopping list
-    private void setupSearchFunctionality() {
-        SearchView searchView = findViewById(R.id.searchView);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                filterBySearch(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                filterBySearch(newText);
-                return false;
-            }
-        });
     }
 }

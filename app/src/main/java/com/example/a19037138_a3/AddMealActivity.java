@@ -4,8 +4,17 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
-import android.widget.*;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,18 +36,22 @@ public class AddMealActivity extends AppCompatActivity {
     // List to store ingredients added to the meal
     private final ArrayList<Ingredient> ingredientsList = new ArrayList<>();
 
+    // DatabaseHelper reference
+    private DatabaseHelper db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_meal);
 
-        // Initialize UI components
+        // Initialize the DatabaseHelper and UI components
+        db = DatabaseHelper.getInstance(this);
         initializeUI();
 
         // Set the back button's click listener to navigate back to MainActivity
         setBackButtonListener();
 
-        // Set listener to show date picker when date field is clicked
+        // Set listener to show the date picker when the date field is clicked
         selectedDateTextView.setOnClickListener(v -> showDatePickerDialog());
 
         // Set listener to dynamically add new ingredient fields
@@ -89,17 +102,15 @@ public class AddMealActivity extends AppCompatActivity {
         }
 
         // Save the meal and its ingredients to the database
-        try (DatabaseHelper db = new DatabaseHelper(this)) {
-            long mealId = db.addMeal(mealName, mealType, formattedDate, ingredientsList);
+        long mealId = db.addMeal(mealName, mealType, formattedDate, ingredientsList);
 
-            if (mealId != -1) {
-                Toast.makeText(this, "Meal added successfully", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                Toast.makeText(this, "Error adding meal", Toast.LENGTH_SHORT).show();
-            }
+        if (mealId != -1) {
+            Toast.makeText(this, "Meal added successfully", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            Toast.makeText(this, "Error adding meal", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -198,9 +209,7 @@ public class AddMealActivity extends AppCompatActivity {
         int day = selectedDateCalendar.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year1, month1, dayOfMonth) -> {
-            selectedDateCalendar.set(Calendar.YEAR, year1);
-            selectedDateCalendar.set(Calendar.MONTH, month1);
-            selectedDateCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            selectedDateCalendar.set(year1, month1, dayOfMonth);
             updateSelectedDateText();
         }, year, month, day);
 
@@ -210,7 +219,14 @@ public class AddMealActivity extends AppCompatActivity {
     // Update the displayed date with the selected date
     private void updateSelectedDateText() {
         SimpleDateFormat displayFormat = new SimpleDateFormat("EEE, MMM d, yyyy", Locale.getDefault());
-        String formattedDate = displayFormat.format(selectedDateCalendar.getTime());
-        selectedDateTextView.setText(formattedDate);
+        selectedDateTextView.setText(displayFormat.format(selectedDateCalendar.getTime()));
     }
+
+    // Clean up resources on activity destruction
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        DatabaseHelper.closeDatabase();
+    }
+
 }

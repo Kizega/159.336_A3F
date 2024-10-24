@@ -8,7 +8,7 @@ public class Ingredient {
     private final int id;         // Unique ID for the ingredient (unchangeable)
     private final String name;    // Name of the ingredient (unchangeable)
     private final String category; // Category like "Vegetable" or "Meat" (unchangeable)
-    private int quantity;         // Quantity of the ingredient (can change)
+    private final int quantity;         // Quantity of the ingredient (can change)
 
     /**
      * Constructor to create a new ingredient.
@@ -45,8 +45,4 @@ public class Ingredient {
         return id;
     }
 
-    // Update the quantity of the ingredient.
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
 }
