@@ -14,6 +14,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import android.widget.ArrayAdapter;
 
+/**
+ * DialogFragment for adding a new ingredient.
+ * It collects the ingredient's name, quantity, and category from the user.
+ */
 public class AddIngredientDialog extends DialogFragment {
 
     private EditText ingredientName;
@@ -22,6 +26,9 @@ public class AddIngredientDialog extends DialogFragment {
     private AddIngredientListener listener;
     private View dialogView;
 
+    /**
+     * Listener interface for passing the new ingredient back to the parent activity.
+     */
     public interface AddIngredientListener {
         void onIngredientAdded(Ingredient ingredient);
     }
@@ -29,9 +36,10 @@ public class AddIngredientDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        // Build the dialog using AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 
-        // Inflate the layout with a non-null parent to resolve layout params
+        // Inflate the dialog layout
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         dialogView = inflater.inflate(R.layout.dialog_add_ingredient, (ViewGroup) getView(), false);
 
@@ -55,8 +63,10 @@ public class AddIngredientDialog extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * Gathers user input and creates a new Ingredient object.
+     */
     private void addIngredient() {
-        // Collect input and pass the new ingredient
         String name = capitalizeWord(ingredientName.getText().toString());
         int quantity = Integer.parseInt(ingredientQuantity.getText().toString());
         String category = ingredientCategory.getSelectedItem().toString();
@@ -68,6 +78,7 @@ public class AddIngredientDialog extends DialogFragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        // Attach listener to parent activity
         if (context instanceof AddIngredientListener) {
             listener = (AddIngredientListener) context;
         } else {
@@ -78,7 +89,7 @@ public class AddIngredientDialog extends DialogFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Release references to avoid memory leaks
+        // Clean up references to avoid memory leaks
         ingredientName = null;
         ingredientQuantity = null;
         ingredientCategory = null;
@@ -86,6 +97,9 @@ public class AddIngredientDialog extends DialogFragment {
         listener = null;
     }
 
+    /**
+     * Capitalizes the first letter of a word.
+     */
     public String capitalizeWord(String word) {
         if (word == null || word.isEmpty()) return word;
         return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();

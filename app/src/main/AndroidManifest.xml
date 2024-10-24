@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Manifest file defining the app's main components and settings. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -13,7 +14,7 @@
         android:theme="@style/Base.Theme._19037138_A3"
         tools:targetApi="31">
 
-        <!-- MainActivity declaration with intent-filter -->
+        <!-- MainActivity is the first screen users see when they open the app. -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -23,10 +24,14 @@
             </intent-filter>
         </activity>
 
-        <!-- Other activity declarations -->
-        <activity android:name=".AddMealActivity"/>
-        <activity android:name=".WeekViewActivity"/>
-        <activity android:name=".ShoppingListActivity"/>
-    </application>
+        <!-- AddMealActivity allows users to add new meals to their plan. -->
+        <activity android:name=".AddMealActivity" />
 
+        <!-- WeekViewActivity displays the meal plan for the entire week. -->
+        <activity android:name=".WeekViewActivity" />
+
+        <!-- ShoppingListActivity helps users manage their shopping lists. -->
+        <activity android:name=".ShoppingListActivity" />
+
+    </application>
 </manifest>

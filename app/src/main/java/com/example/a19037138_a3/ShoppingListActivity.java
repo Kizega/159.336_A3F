@@ -17,14 +17,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
+
 import java.util.ArrayList;
+import android.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.widget.Button;
+import android.widget.EditText;
+
 
 import android.widget.ArrayAdapter;
 
 public class ShoppingListActivity extends AppCompatActivity
         implements AddIngredientDialog.AddIngredientListener, ShoppingListAdapter.OnIngredientDeleteListener {
 
-    private ShoppingListViewModel viewModel; // ViewModel to manage data
+    ShoppingListViewModel viewModel; // ViewModel to manage data
     private ShoppingListAdapter adapter;
     private RecyclerView recyclerView;
 
@@ -34,6 +41,7 @@ public class ShoppingListActivity extends AppCompatActivity
         setContentView(R.layout.activity_shopping_list);
 
         viewModel = new ViewModelProvider(this).get(ShoppingListViewModel.class);
+        viewModel.setSnackbarListener(this::showUndoSnackbar);
 
         setupRecyclerView();
         setupCategorySpinner();
@@ -49,12 +57,15 @@ public class ShoppingListActivity extends AppCompatActivity
         observeData();
     }
 
-    // Observes changes in the ingredient list from the ViewModel
     private void observeData() {
-        viewModel.getIngredients().observe(this, ingredients -> adapter.updateList(new ArrayList<>(ingredients)));
+        viewModel.getIngredients().observe(this, ingredients -> {
+            adapter.updateList(new ArrayList<>(ingredients));
+            adapter.notifyDataSetChanged(); // Force the adapter to refresh
+        });
 
         viewModel.loadShoppingList(getSelectedCategory());
     }
+
 
     private void setupCategorySpinner() {
         Spinner categorySpinner = findViewById(R.id.category_spinner);
@@ -102,20 +113,23 @@ public class ShoppingListActivity extends AppCompatActivity
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                // Use getBindingAdapterPosition() to handle the position correctly
                 int position = viewHolder.getBindingAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
                     Ingredient ingredient = adapter.getIngredientAt(position);
 
+                    // Delete the ingredient from the database
                     viewModel.deleteIngredient(ingredient);
-                    Snackbar.make(recyclerView, "Item removed", Snackbar.LENGTH_LONG)
-                            .setAction("UNDO", v -> viewModel.undoDelete(ingredient))
-                            .show();
+
+                    // Show the undo Snackbar
+                    showUndoSnackbar(ingredient, ingredient.getQuantity());  // Reuse the same method
                 }
             }
         };
+
         new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
     }
+
+
 
 
     private void setupSearchFunctionality() {
@@ -173,4 +187,63 @@ public class ShoppingListActivity extends AppCompatActivity
             recyclerView.setAdapter(null);  // Release adapter to prevent memory leaks
         }
     }
+    void showQuantityDialog(Ingredient ingredient, int position) {
+        int originalQuantity = ingredient.getQuantity();  // Store the original quantity
+
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_quantity, null);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Adjust Quantity")
+                .setView(dialogView)
+                .setNegativeButton("Cancel", (dialogInterface, which) -> {
+                    // Restore the swiped item in the RecyclerView
+                    adapter.notifyItemChanged(position);
+                })
+                .create();
+
+        EditText quantityInput = dialogView.findViewById(R.id.quantity_input);
+        Button removeButton = dialogView.findViewById(R.id.remove_button);
+        Button deleteAllButton = dialogView.findViewById(R.id.delete_all_button);
+
+        removeButton.setOnClickListener(v -> {
+            String inputText = quantityInput.getText().toString().trim();
+            if (!inputText.isEmpty()) {
+                int quantityToRemove = Integer.parseInt(inputText);
+
+                if (quantityToRemove > 0 && quantityToRemove <= originalQuantity) {
+                    // Reduce the quantity in the database
+                    viewModel.reduceIngredientQuantity(ingredient, quantityToRemove);
+                    dialog.dismiss();
+
+                    // Show undo snackbar with the original quantity
+                    showUndoSnackbar(ingredient, originalQuantity);
+                } else {
+                    quantityInput.setError("Invalid quantity");
+                }
+            } else {
+                quantityInput.setError("Please enter a quantity");
+            }
+        });
+
+        deleteAllButton.setOnClickListener(v -> {
+            viewModel.deleteIngredient(ingredient);
+            dialog.dismiss();
+
+            // Show undo snackbar with the original quantity
+            showUndoSnackbar(ingredient, originalQuantity);
+        });
+
+        dialog.show();
+    }
+
+    private void showUndoSnackbar(Ingredient ingredient, int originalQuantity) {
+        Snackbar.make(recyclerView, "Ingredient updated", Snackbar.LENGTH_LONG)
+                .setAction("UNDO", v -> {
+                    // Restore the original quantity exactly as it was before
+                    viewModel.restoreOriginalQuantity(ingredient, originalQuantity);
+                })
+                .show();
+    }
+
+
 }

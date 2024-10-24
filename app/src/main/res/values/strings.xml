@@ -77,6 +77,6 @@
     <string name="sort_by_name">Sort by Name</string>
     <string name="sort_by_quantity">Sort by Quantity</string>
     <string name="share_list">Share List</string>
-    <string name="add_meal">add meal\n</string>
+    <string name="add_meal">Add Meal\n</string>
 
 </resources>

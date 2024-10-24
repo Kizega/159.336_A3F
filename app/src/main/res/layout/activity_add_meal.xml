@@ -125,16 +125,17 @@
     <!-- Add meal button at the bottom -->
     <Button
         android:id="@+id/add_meal_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="250dp"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="24dp"
         android:background="@drawable/rounded_button"
         android:text="@string/add_meal"
         android:textColor="@color/chocolate_brown"
-        app:backgroundTint="@color/cookie_beige"
         android:textSize="18sp"
-        android:maxWidth="300dp"
-        android:padding="16dp" />
+        android:gravity="center"
+        android:padding="10dp"
+        android:elevation="8dp" />
+
 </RelativeLayout>

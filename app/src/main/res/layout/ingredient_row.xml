@@ -1,70 +1,39 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp"
-    android:minHeight="56dp"
-    android:gravity="center_vertical">
+    android:padding="8dp">
 
-    <!-- Checkbox -->
     <CheckBox
         android:id="@+id/ingredientCheckbox"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:contentDescription="@string/checkbox_ingredient"
-        android:importantForAccessibility="yes"
-        android:labelFor="@+id/ingredientName"
-        tools:ignore="RedundantDescriptionCheck" />
+        android:contentDescription="@string/checkbox_ingredient" />
 
-    <!-- Ingredient name input -->
-    <com.google.android.material.textfield.TextInputLayout
+    <TextView
+        android:id="@+id/ingredientName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginEnd="8dp"
-        android:hint="@string/ingredient_name_hint">
+        android:layout_weight="1.5"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:padding="8dp"
+        android:ellipsize="end"
+        android:maxLines="1" />
 
-        <AutoCompleteTextView
-            android:id="@+id/ingredientName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:padding="12dp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:importantForAccessibility="yes"
-            android:autofillHints="name"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            tools:ignore="VisualLintTextFieldSize" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Quantity input -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="80dp"
+    <TextView
+        android:id="@+id/ingredientQuantity"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:hint="@string/quantity_hint"
-        android:labelFor="@+id/ingredientQuantity">
+        android:layout_weight="0.5"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:padding="8dp"
+        android:gravity="end"
+        android:ellipsize="end"
+        android:maxLines="1" />
 
-        <EditText
-            android:id="@+id/ingredientQuantity"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:inputType="number"
-            android:padding="12dp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:importantForAccessibility="yes"
-            android:autofillHints="quantity"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:background="?android:attr/editTextBackground" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Delete button -->
     <ImageButton
         android:id="@+id/deleteIngredientButton"
         android:layout_width="48dp"
