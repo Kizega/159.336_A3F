@@ -1,13 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:padding="16dp">
 
-    <!-- Top container for the back button and title -->
+    <!-- Top container for back button and title -->
     <LinearLayout
         android:id="@+id/top_container"
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
-        <!-- Back Button -->
+        <!-- Back button to navigate to the previous screen -->
         <ImageButton
             android:id="@+id/back_button"
             android:layout_width="48dp"
@@ -29,9 +29,9 @@
             android:contentDescription="@string/back"
             android:padding="8dp"
             android:backgroundTint="@color/cookie_beige"
-            app:tint="@color/chocolate_brown" />
+            app:tint="@android:color/black" />
 
-        <!-- Title TextView -->
+        <!-- Title aligned to the center -->
         <TextView
             android:id="@+id/shopping_list_title"
             android:layout_width="0dp"
@@ -60,7 +60,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:queryHint="Search ingredients..."
+            android:queryHint="@string/search_hint"
             android:layout_marginEnd="8dp" />
 
         <!-- Spinner for category filtering -->
@@ -96,7 +96,6 @@
         android:layout_margin="16dp"
         android:backgroundTint="@color/cookie_beige"
         android:contentDescription="@string/add_item"
-        app:srcCompat="@android:drawable/ic_input_add"
-        tools:ignore="ImageContrastCheck" />
+        app:srcCompat="@android:drawable/ic_input_add" />
 
 </RelativeLayout>

@@ -22,6 +22,7 @@
         app:boxStrokeColor="@color/chocolate_brown"
         app:hintTextColor="@color/chocolate_brown">
 
+        <!-- Input field for the ingredient's name -->
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ingredient_name"
             android:layout_width="match_parent"
@@ -30,7 +31,6 @@
             android:textColor="@android:color/black"
             android:textColorHint="#757575"
             tools:ignore="TextContrastCheck" />
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Ingredient Quantity Input -->
@@ -48,6 +48,7 @@
         app:boxStrokeColor="@color/chocolate_brown"
         app:hintTextColor="@color/chocolate_brown">
 
+        <!-- Input field for the ingredient's quantity -->
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ingredient_quantity"
             android:layout_width="match_parent"
@@ -56,10 +57,9 @@
             android:textColor="@android:color/black"
             android:textColorHint="#757575"
             tools:ignore="TextContrastCheck" />
-
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Ingredient Category Spinner -->
+    <!-- Spinner for selecting the ingredient category -->
     <Spinner
         android:id="@+id/ingredient_category"
         android:layout_width="0dp"

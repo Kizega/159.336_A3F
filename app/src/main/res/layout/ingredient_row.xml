@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -5,12 +6,14 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
+    <!-- Checkbox for marking the ingredient as selected or purchased -->
     <CheckBox
         android:id="@+id/ingredientCheckbox"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:contentDescription="@string/checkbox_ingredient" />
+        android:contentDescription="@string/ingredient_checkbox_description" />
 
+    <!-- TextView to display the ingredient name -->
     <TextView
         android:id="@+id/ingredientName"
         android:layout_width="0dp"
@@ -20,8 +23,10 @@
         android:textColor="@android:color/black"
         android:padding="8dp"
         android:ellipsize="end"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:contentDescription="@string/ingredient_name" />
 
+    <!-- TextView to display the quantity of the ingredient -->
     <TextView
         android:id="@+id/ingredientQuantity"
         android:layout_width="0dp"
@@ -32,8 +37,10 @@
         android:padding="8dp"
         android:gravity="end"
         android:ellipsize="end"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:contentDescription="@string/ingredient_quantity" />
 
+    <!-- ImageButton to delete the ingredient -->
     <ImageButton
         android:id="@+id/deleteIngredientButton"
         android:layout_width="48dp"

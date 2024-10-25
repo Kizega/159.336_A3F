@@ -10,7 +10,7 @@
     android:background="@android:color/white"
     android:gravity="center_vertical">
 
-    <!-- Meal Icon with improved tint and contrast -->
+    <!-- Icon representing the meal type with proper tint and background styling -->
     <ImageView
         android:id="@+id/mealIcon"
         android:layout_width="48dp"
@@ -23,7 +23,7 @@
         app:tint="@color/chocolate_brown"
         tools:ignore="ImageContrastCheck" />
 
-    <!-- Meal Name TextView with proper formatting -->
+    <!-- TextView displaying the name of the meal -->
     <TextView
         android:id="@+id/mealName"
         android:layout_width="wrap_content"

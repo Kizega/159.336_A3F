@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <!-- Top container for back button and title -->
+    <!-- Top container for the back button and the title -->
     <LinearLayout
         android:id="@+id/top_container"
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
             android:backgroundTint="@color/cookie_beige"
             app:tint="@color/chocolate_brown" />
 
-        <!-- Title -->
+        <!-- Title TextView -->
         <TextView
             android:id="@+id/add_meal_title"
             android:layout_width="0dp"
@@ -40,10 +40,11 @@
             android:textStyle="bold"
             android:textColor="@color/chocolate_brown"
             android:gravity="center"
-            android:layout_marginStart="16dp" />
+            android:layout_marginStart="16dp"
+            android:importantForAccessibility="no" />
     </LinearLayout>
 
-    <!-- Scrollable content for meal details -->
+    <!-- Scrollable section for meal details -->
     <ScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
@@ -58,7 +59,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Meal name input -->
+            <!-- Input field for meal name -->
             <AutoCompleteTextView
                 android:id="@+id/meal_name"
                 android:layout_width="match_parent"
@@ -73,7 +74,7 @@
                 android:maxLines="1"
                 android:textColorHint="@color/chocolate_brown" />
 
-            <!-- Meal type spinner -->
+            <!-- Spinner for selecting meal type -->
             <Spinner
                 android:id="@+id/meal_type_spinner"
                 android:layout_width="match_parent"
@@ -81,23 +82,25 @@
                 android:layout_marginStart="-8dp"
                 android:layout_marginBottom="16dp"
                 android:entries="@array/meal_type_array"
-                android:padding="16dp" />
+                android:padding="16dp"
+                android:contentDescription="@string/meal_type" />
 
-            <!-- Selected date -->
+            <!-- TextView for selecting date -->
             <TextView
                 android:id="@+id/selected_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/select_date_hint"
-                android:textColor="@color/chocolate_brown"
-                android:textSize="18sp"
-                android:paddingTop="8dp"
                 android:layout_marginBottom="16dp"
-                android:gravity="center_vertical"
-                android:padding="16dp"
-                android:maxLines="1"
                 android:clickable="true"
-                android:focusable="true" />
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:hint="@string/select_date_hint"
+                android:maxLines="1"
+                android:padding="16dp"
+                android:paddingTop="8dp"
+                android:textColor="@color/chocolate_brown"
+                android:textColorHint="#757575"
+                android:textSize="18sp" />
 
             <!-- Dynamic container for ingredients -->
             <LinearLayout
@@ -107,7 +110,7 @@
                 android:orientation="vertical"
                 android:paddingBottom="16dp" />
 
-            <!-- Add ingredient button -->
+            <!-- Button to add an ingredient -->
             <Button
                 android:id="@+id/add_ingredient_button"
                 android:layout_width="wrap_content"
@@ -118,11 +121,12 @@
                 android:textColor="@color/chocolate_brown"
                 android:textSize="16sp"
                 app:backgroundTint="@color/cookie_beige"
-                android:padding="16dp" />
+                android:padding="16dp"
+                android:contentDescription="@string/add_ingredient_button" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- Add meal button at the bottom -->
+    <!-- Button to add the meal, avoiding duplicate speakable text -->
     <Button
         android:id="@+id/add_meal_button"
         android:layout_width="250dp"
@@ -136,6 +140,6 @@
         android:textSize="18sp"
         android:gravity="center"
         android:padding="10dp"
-        android:elevation="8dp" />
-
+        android:elevation="8dp"
+        android:contentDescription="@string/add_meal_button" />
 </RelativeLayout>

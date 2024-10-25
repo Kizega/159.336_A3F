@@ -6,17 +6,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-import android.widget.ArrayAdapter;
 
 /**
  * DialogFragment for adding a new ingredient.
- * It collects the ingredient's name, quantity, and category from the user.
+ * Provides user input fields for name, quantity, and category selection.
  */
 public class AddIngredientDialog extends DialogFragment {
 
@@ -27,34 +27,43 @@ public class AddIngredientDialog extends DialogFragment {
     private View dialogView;
 
     /**
-     * Listener interface for passing the new ingredient back to the parent activity.
+     * Interface to pass the new ingredient back to the parent activity.
      */
     public interface AddIngredientListener {
         void onIngredientAdded(Ingredient ingredient);
     }
 
+    /**
+     * Attaches the dialog to the parent activity, ensuring it implements the required listener.
+     *
+     * @param context The context of the parent activity.
+     */
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof AddIngredientListener) {
+            listener = (AddIngredientListener) context;
+        } else {
+            throw new RuntimeException(context + " must implement AddIngredientListener");
+        }
+    }
+
+    /**
+     * Creates and returns the dialog instance with user input fields.
+     *
+     * @param savedInstanceState Contains the previous state if the activity is re-initialized.
+     * @return A configured AlertDialog instance.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        // Build the dialog using AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
-
-        // Inflate the dialog layout
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         dialogView = inflater.inflate(R.layout.dialog_add_ingredient, (ViewGroup) getView(), false);
 
-        // Initialize UI elements
-        ingredientName = dialogView.findViewById(R.id.ingredient_name);
-        ingredientQuantity = dialogView.findViewById(R.id.ingredient_quantity);
-        ingredientCategory = dialogView.findViewById(R.id.ingredient_category);
+        initializeUIComponents(); // Initialize the dialog's UI elements
+        configureSpinner();        // Set up the spinner with categories
 
-        // Set up the spinner with categories
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
-                requireContext(), R.array.category_no_all, android.R.layout.simple_spinner_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        ingredientCategory.setAdapter(spinnerAdapter);
-
-        // Configure dialog buttons
         builder.setView(dialogView)
                 .setTitle("Add Ingredient")
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
@@ -64,7 +73,26 @@ public class AddIngredientDialog extends DialogFragment {
     }
 
     /**
-     * Gathers user input and creates a new Ingredient object.
+     * Initializes the dialog's input fields and category spinner.
+     */
+    private void initializeUIComponents() {
+        ingredientName = dialogView.findViewById(R.id.ingredient_name);
+        ingredientQuantity = dialogView.findViewById(R.id.ingredient_quantity);
+        ingredientCategory = dialogView.findViewById(R.id.ingredient_category);
+    }
+
+    /**
+     * Configures the category spinner with predefined options.
+     */
+    private void configureSpinner() {
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+                requireContext(), R.array.category_no_all, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ingredientCategory.setAdapter(spinnerAdapter);
+    }
+
+    /**
+     * Gathers user input to create a new Ingredient object and passes it to the listener.
      */
     private void addIngredient() {
         String name = capitalizeWord(ingredientName.getText().toString());
@@ -72,24 +100,15 @@ public class AddIngredientDialog extends DialogFragment {
         String category = ingredientCategory.getSelectedItem().toString();
 
         Ingredient newIngredient = new Ingredient(0, name, category, quantity);
-        listener.onIngredientAdded(newIngredient);
+        listener.onIngredientAdded(newIngredient); // Pass the new ingredient to the listener
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        // Attach listener to parent activity
-        if (context instanceof AddIngredientListener) {
-            listener = (AddIngredientListener) context;
-        } else {
-            throw new RuntimeException(context + " must implement AddIngredientListener");
-        }
-    }
-
+    /**
+     * Cleans up references to avoid memory leaks when the view is destroyed.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Clean up references to avoid memory leaks
         ingredientName = null;
         ingredientQuantity = null;
         ingredientCategory = null;
@@ -98,7 +117,10 @@ public class AddIngredientDialog extends DialogFragment {
     }
 
     /**
-     * Capitalizes the first letter of a word.
+     * Capitalizes the first letter of the given word.
+     *
+     * @param word The word to capitalize.
+     * @return The word with its first letter capitalized.
      */
     public String capitalizeWord(String word) {
         if (word == null || word.isEmpty()) return word;
